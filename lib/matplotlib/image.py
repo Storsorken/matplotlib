@@ -355,31 +355,48 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
         trans : Affine2D
             The affine transformation from image to pixel space.
         """
+        flags = [False for _ in range(58)]
+
+
         if A is None:
+            flags[0] = True
             raise RuntimeError('You must first set the image '
                                'array or the image attribute')
+        else:
+            flags[1] = True
         if A.size == 0:
+            flags[2] = True
             raise RuntimeError("_make_image must get a non-empty image. "
                                "Your Artist's draw method must filter before "
                                "this method is called.")
+        else:
+            flags[3] = True
 
         clipped_bbox = Bbox.intersection(out_bbox, clip_bbox)
 
         if clipped_bbox is None:
+            flags[4] = True
             return None, 0, 0, None
+        else:
+            flags[5] = True
 
         out_width_base = clipped_bbox.width * magnification
         out_height_base = clipped_bbox.height * magnification
 
         if out_width_base == 0 or out_height_base == 0:
+            flags[6] = True
             return None, 0, 0, None
+        else:
+            flags[7] = True
 
         if self.origin == 'upper':
+            flags[8] = True
             # Flip the input image using a transform.  This avoids the
             # problem with flipping the array, which results in a copy
             # when it is converted to contiguous in the C wrapper
             t0 = Affine2D().translate(0, -A.shape[0]).scale(1, -1)
         else:
+            flags[9] = True
             t0 = IdentityTransform()
 
         t0 += (
@@ -400,20 +417,27 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
         # scaling the transform slightly to account for the extra subpixel.
         if (t.is_affine and round_to_pixel_border and
                 (out_width_base % 1.0 != 0.0 or out_height_base % 1.0 != 0.0)):
+            flags[10] = True
             out_width = math.ceil(out_width_base)
             out_height = math.ceil(out_height_base)
             extra_width = (out_width - out_width_base) / out_width_base
             extra_height = (out_height - out_height_base) / out_height_base
             t += Affine2D().scale(1.0 + extra_width, 1.0 + extra_height)
         else:
+            flags[11] = True
             out_width = int(out_width_base)
             out_height = int(out_height_base)
         out_shape = (out_height, out_width)
 
         if not unsampled:
+            flags[12] = True
             if not (A.ndim == 2 or A.ndim == 3 and A.shape[-1] in (3, 4)):
+                flags[13] = True
                 raise ValueError(f"Invalid shape {A.shape} for image data")
+            else:
+                flags[14] = True
             if A.ndim == 2 and self._interpolation_stage != 'rgba':
+                flags[15] = True
                 # if we are a 2D array, then we are running through the
                 # norm + colormap transformation.  However, in general the
                 # input data is not going to match the size on the screen so we
@@ -423,18 +447,35 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 a_min = A.min()
                 a_max = A.max()
                 if a_min is np.ma.masked:  # All masked; values don't matter.
+                    flags[16] = True
                     a_min, a_max = np.int32(0), np.int32(1)
+                else:
+                    flags[17] = True
                 if A.dtype.kind == 'f':  # Float dtype: scale to same dtype.
-                    scaled_dtype = np.dtype(
-                        np.float64 if A.dtype.itemsize > 4 else np.float32)
+                    flags[18] = True
+                    if A.dtype.itemsize > 4:
+                        flags[19] = True
+                        scaled_dtype = np.dtype(np.float64)
+                    else:
+                        flags[20] = True
+                        scaled_dtype = np.dtype(np.float32)
                     if scaled_dtype.itemsize < A.dtype.itemsize:
+                        flags[21] = True
                         _api.warn_external(f"Casting input data from {A.dtype}"
                                            f" to {scaled_dtype} for imshow.")
+                    else:
+                        flags[22] = True
                 else:  # Int dtype, likely.
                     # Scale to appropriately sized float: use float32 if the
                     # dynamic range is small, to limit the memory footprint.
+                    flags[23] = True
                     da = a_max.astype(np.float64) - a_min.astype(np.float64)
-                    scaled_dtype = np.float64 if da > 1e8 else np.float32
+                    if da > 1e8:
+                        flags[24] = True
+                        scaled_dtype = np.float64
+                    else:
+                        flags[25] = True
+                        scaled_dtype = np.float32
 
                 # Scale the input data to [.1, .9].  The Agg interpolators clip
                 # to [0, 1] internally, and we use a smaller input scale to
@@ -451,19 +492,31 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 self.norm.autoscale_None(A)
                 dv = np.float64(self.norm.vmax) - np.float64(self.norm.vmin)
                 vmid = np.float64(self.norm.vmin) + dv / 2
-                fact = 1e7 if scaled_dtype == np.float64 else 1e4
+                if scaled_dtype == np.float64:
+                    flags[26] = True
+                    fact = 1e7
+                else:
+                    flags[27] = True
+                    fact = 1e4
                 newmin = vmid - dv * fact
                 if newmin < a_min:
+                    flags[28] = True
                     newmin = None
                 else:
+                    flags[29] = True
                     a_min = np.float64(newmin)
                 newmax = vmid + dv * fact
                 if newmax > a_max:
+                    flags[30] = True
                     newmax = None
                 else:
+                    flags[31] = True
                     a_max = np.float64(newmax)
                 if newmax is not None or newmin is not None:
+                    flags[32] = True
                     np.clip(A_scaled, newmin, newmax, out=A_scaled)
+                else:
+                    flags[33] = True
 
                 # Rescale the raw data to [offset, 1-offset] so that the
                 # resampling code will run cleanly.  Using dyadic numbers here
@@ -478,7 +531,10 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 # end up on the wrong side due to floating point error.
                 vmin, vmax = self.norm.vmin, self.norm.vmax
                 if vmin is np.ma.masked:
+                    flags[34] = True
                     vmin, vmax = a_min, a_max
+                else:
+                    flags[35] = True
                 vrange = np.array([vmin, vmax], dtype=scaled_dtype)
 
                 A_scaled -= a_min
@@ -488,8 +544,11 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 a_max = a_max.astype(scaled_dtype).item()
 
                 if a_min != a_max:
+                    flags[36] = True
                     A_scaled /= ((a_max - a_min) / frac)
                     vrange /= ((a_max - a_min) / frac)
+                else:
+                    flags[37] = True
                 A_scaled += offset
                 vrange += offset
                 # resample the input data to the correct resolution and shape
@@ -502,17 +561,27 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 A_resampled -= offset
                 vrange -= offset
                 if a_min != a_max:
+                    flags[38] = True
                     A_resampled *= ((a_max - a_min) / frac)
                     vrange *= ((a_max - a_min) / frac)
+                else:
+                    flags[39] = True
                 A_resampled += a_min
                 vrange += a_min
                 # if using NoNorm, cast back to the original datatype
                 if isinstance(self.norm, mcolors.NoNorm):
+                    flags[40] = True
                     A_resampled = A_resampled.astype(A.dtype)
+                else:
+                    flags[41] = True
 
-                mask = (np.where(A.mask, np.float32(np.nan), np.float32(1))
-                        if A.mask.shape == A.shape  # nontrivial mask
-                        else np.ones_like(A, np.float32))
+                if A.mask.shape == A.shape: # nontrivial mask
+                    flags[42] = True
+                    mask = np.where(A.mask, np.float32(np.nan), np.float32(1))
+                else:
+                    flags[43] = True
+                    mask = np.ones_like(A, np.float32)
+
                 # we always have to interpolate the mask to account for
                 # non-affine transformations
                 out_alpha = _resample(self, mask, out_shape, t, resample=True)
@@ -528,27 +597,40 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
                 # Apply the pixel-by-pixel alpha values if present
                 alpha = self.get_alpha()
                 if alpha is not None and np.ndim(alpha) > 0:
+                    flags[44] = True
                     out_alpha *= _resample(self, alpha, out_shape,
                                            t, resample=True)
+                else:
+                    flags[45] = True
                 # mask and run through the norm
                 resampled_masked = np.ma.masked_array(A_resampled, out_mask)
                 # we have re-set the vmin/vmax to account for small errors
                 # that may have moved input values in/out of range
                 s_vmin, s_vmax = vrange
                 if isinstance(self.norm, mcolors.LogNorm) and s_vmin <= 0:
+                    flags[46] = True
                     # Don't give 0 or negative values to LogNorm
                     s_vmin = np.finfo(scaled_dtype).eps
+                else:
+                    flags[47] = True
                 # Block the norm from sending an update signal during the
                 # temporary vmin/vmax change
                 with self.norm.callbacks.blocked(), \
                      cbook._setattr_cm(self.norm, vmin=s_vmin, vmax=s_vmax):
                     output = self.norm(resampled_masked)
             else:
+                flags[48] = True
                 if A.ndim == 2:  # _interpolation_stage == 'rgba'
+                    flags[49] = True
                     self.norm.autoscale_None(A)
                     A = self.to_rgba(A)
+                else:
+                    flags[50] = True
                 if A.shape[2] == 3:
+                    flags[51] = True
                     A = _rgb_to_rgba(A)
+                else:
+                    flags[52] = True
                 alpha = self._get_scalar_alpha()
                 output_alpha = _resample(  # resample alpha channel
                     self, A[..., 3], out_shape, t, alpha=alpha)
@@ -563,14 +645,21 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
 
             # Apply alpha *after* if the input was greyscale without a mask
             if A.ndim == 2:
+                flags[53] = True
                 alpha = self._get_scalar_alpha()
                 alpha_channel = output[:, :, 3]
                 alpha_channel[:] = (  # Assignment will cast to uint8.
                     alpha_channel.astype(np.float32) * out_alpha * alpha)
+            else:
+                flags[54] = True
 
         else:
+            flags[55] = True
             if self._imcache is None:
+                flags[56] = True
                 self._imcache = self.to_rgba(A, bytes=True, norm=(A.ndim == 2))
+            else:
+                flags[57] = True
             output = self._imcache
 
             # Subset the input image to only the part that will be displayed.
