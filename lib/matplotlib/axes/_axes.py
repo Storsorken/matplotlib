@@ -30,11 +30,13 @@ import matplotlib.ticker as mticker
 import matplotlib.transforms as mtransforms
 import matplotlib.tri as mtri
 import matplotlib.units as munits
+import yaml
 from matplotlib import _api, _docstring, _preprocess_data
 from matplotlib.axes._base import (
     _AxesBase, _TransformedBoundsLocator, _process_plot_format)
 from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
+from pathlib import Path
 
 _log = logging.getLogger(__name__)
 
@@ -1300,10 +1302,19 @@ class Axes(_AxesBase):
         --------
         .. plot:: gallery/lines_bars_and_markers/eventplot_demo.py
         """
+        #working with the YML-file
+        root_folder= Path(__file__).parents[1] / "../../flag_arrays.yml"
+        with open(root_folder) as fin:
+            data=yaml.load(fin, Loader=yaml.FullLoader)
+            flag=data["EVENTPLOT_ARRAY"]
+        if len(flag)==0:
+            flag = [False for _ in range(61)] 
 
-        flag=[]
-        flag = [False for _ in range(61)] 
-
+        #writing to YML-file
+        data["EVENTPLOT_ARRAY"]=flag
+        with open(root_folder,"w") as f:
+            yaml.dump(data,f)
+        
         lineoffsets, linelengths = self._process_unit_info(
                 [("y", lineoffsets), ("y", linelengths)], kwargs)
 
