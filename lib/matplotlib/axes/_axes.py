@@ -36,6 +36,9 @@ from matplotlib.axes._base import (
 from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
 
+import yaml
+from pathlib import Path
+
 _log = logging.getLogger(__name__)
 
 
@@ -3906,7 +3909,13 @@ class Axes(_AxesBase):
         violinplot : Draw an estimate of the probability density function.
         """
 
-        flags = [False for _ in range(61)]
+        # load global branch coverage array
+        root_folder = Path(__file__).parents[1] / "../../flag_arrays.yml"
+        with open(root_folder) as fin:
+            data = yaml.load(fin, Loader=yaml.FullLoader)
+            flags = data["BOXPLOT_ARRAY"] 
+        if len(flags) == 0: # If first time loading array
+            flags = [False for _ in range(61)]
 
         # Missing arguments default to rcParams.
         if whis is None:
@@ -4119,6 +4128,12 @@ class Axes(_AxesBase):
                            capprops=capprops, whiskerprops=whiskerprops,
                            manage_ticks=manage_ticks, zorder=zorder,
                            capwidths=capwidths)
+        
+        # Save to yml file
+        data["BOXPLOT_ARRAY"] = flags
+        with open(root_folder, "w") as f:
+            yaml.dump(data, f)
+
         return artists
 
     def bxp(self, bxpstats, positions=None, widths=None, vert=True,
