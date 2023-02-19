@@ -355,7 +355,16 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
         trans : Affine2D
             The affine transformation from image to pixel space.
         """
-        flags = [False for _ in range(58)]
+        
+        """
+        working with the YML-file
+        """
+        root_folder = Path(__file__).parents[1] / "../flag_arrays.yml"
+        with open(root_folder) as fin:
+                data = yaml.load(fin, Loader=yaml.FullLoader)
+                flags = data["MAKE_IMAGE_ARRAY"] # Change this so it is your array
+        if len(flags) == 0: # If first time loading array
+            flags = [False for _ in range(58)]
 
 
         if A is None:
@@ -672,6 +681,14 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
 
             t = Affine2D().translate(
                 int(max(subset.xmin, 0)), int(max(subset.ymin, 0))) + t
+
+                    
+        """
+        writing to YML-file
+        """
+        data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+        with open(root_folder, "w") as f:
+            yaml.dump(data, f)
 
         return output, clipped_bbox.x0, clipped_bbox.y0, t
 
