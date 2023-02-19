@@ -57,6 +57,8 @@ import numpy as np
 
 from matplotlib import _api, _docstring, cbook
 
+import yaml
+from pathlib import Path
 
 def window_hanning(x):
     """
@@ -295,87 +297,124 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     Private helper implementing the common parts between the psd, csd,
     spectrogram and complex, magnitude, angle, and phase spectrums.
     """
+
+    """
+    working with the YML-file
+    """
+    root_folder = Path(__file__).parents[1] / "../flag_arrays.yml"
+    with open(root_folder) as fin:
+            data = yaml.load(fin, Loader=yaml.FullLoader)
+            flags = data["SPECTRAL_HELPER_ARRAY"] # Change this so it is your array
+    if len(flags) == 0: # If first time loading array
+        flags = [False for _ in range(39)]
+
     if y is None:
+        flags[0] = False
         # if y is None use x for y
         same_data = True
     else:
+        flags[1] = True
         # The checks for if y is x are so that we can use the same function to
         # implement the core of psd(), csd(), and spectrogram() without doing
         # extra calculations.  We return the unaveraged Pxy, freqs, and t.
         same_data = y is x
 
     if Fs is None:
+        flags[2] = True
         Fs = 2
     if noverlap is None:
+        flags[3] = True
         noverlap = 0
     if detrend_func is None:
+        flags[4] = True
         detrend_func = detrend_none
     if window is None:
+        flags[5] = True
         window = window_hanning
 
     # if NFFT is set to None use the whole signal
     if NFFT is None:
+        flags[6] = True
         NFFT = 256
 
     if mode is None or mode == 'default':
+        flags[7] = True
         mode = 'psd'
     _api.check_in_list(
         ['default', 'psd', 'complex', 'magnitude', 'angle', 'phase'],
         mode=mode)
 
     if not same_data and mode != 'psd':
+        flags[8] = True
         raise ValueError("x and y must be equal if mode is not 'psd'")
 
     # Make sure we're dealing with a numpy array. If y and x were the same
     # object to start with, keep them that way
     x = np.asarray(x)
     if not same_data:
+        flags[9] = True
         y = np.asarray(y)
 
     if sides is None or sides == 'default':
+        flags[10] = True
         if np.iscomplexobj(x):
+            flags[11] = True
             sides = 'twosided'
         else:
+            flags[12] = True
             sides = 'onesided'
     _api.check_in_list(['default', 'onesided', 'twosided'], sides=sides)
 
     # zero pad x and y up to NFFT if they are shorter than NFFT
     if len(x) < NFFT:
+        flags[13] = True
         n = len(x)
         x = np.resize(x, NFFT)
         x[n:] = 0
 
     if not same_data and len(y) < NFFT:
+        flags[14] = True
         n = len(y)
         y = np.resize(y, NFFT)
         y[n:] = 0
 
     if pad_to is None:
+        flags[15] = True
         pad_to = NFFT
 
     if mode != 'psd':
+        flags[16] = True
         scale_by_freq = False
     elif scale_by_freq is None:
+        flags[17] = True
         scale_by_freq = True
 
     # For real x, ignore the negative frequencies unless told otherwise
     if sides == 'twosided':
+        flags[18] = True
         numFreqs = pad_to
         if pad_to % 2:
+            flags[19] = True
             freqcenter = (pad_to - 1)//2 + 1
         else:
+            flags[20] = True
             freqcenter = pad_to//2
         scaling_factor = 1.
     elif sides == 'onesided':
+        flags[21] = True
         if pad_to % 2:
+            flags[22] = True
             numFreqs = (pad_to + 1)//2
         else:
+            flags[23] = True
             numFreqs = pad_to//2 + 1
         scaling_factor = 2.
 
     if not np.iterable(window):
+        flags[24] = True
         window = window(np.ones(NFFT, x.dtype))
     if len(window) != NFFT:
+        flags[25] = True
         raise ValueError(
             "The window length must match the data's first dimension")
 
@@ -386,6 +425,7 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     freqs = np.fft.fftfreq(pad_to, 1/Fs)[:numFreqs]
 
     if not same_data:
+        flags[26] = True
         # if same_data is False, mode must be 'psd'
         resultY = _stride_windows(y, NFFT, noverlap)
         resultY = detrend(resultY, detrend_func, axis=0)
@@ -393,26 +433,32 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
         resultY = np.fft.fft(resultY, n=pad_to, axis=0)[:numFreqs, :]
         result = np.conj(result) * resultY
     elif mode == 'psd':
+        flags[27] = True
         result = np.conj(result) * result
     elif mode == 'magnitude':
+        flags[28] = True
         result = np.abs(result) / window.sum()
     elif mode == 'angle' or mode == 'phase':
+        flags[29] = True
         # we unwrap the phase later to handle the onesided vs. twosided case
         result = np.angle(result)
     elif mode == 'complex':
+        flags[30] = True
         result /= window.sum()
 
     if mode == 'psd':
-
+        flags[31] = True
         # Also include scaling factors for one-sided densities and dividing by
         # the sampling frequency, if desired. Scale everything, except the DC
         # component and the NFFT/2 component:
 
         # if we have a even number of frequencies, don't scale NFFT/2
         if not NFFT % 2:
+            flags[32] = True
             slc = slice(1, -1, None)
         # if we have an odd number, just don't scale DC
         else:
+            flags[33] = True
             slc = slice(1, None, None)
 
         result[slc] *= scaling_factor
@@ -421,27 +467,39 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
         # has units of dB/Hz and can be integrated by the plotted frequency
         # values. Perform the same scaling here.
         if scale_by_freq:
+            flags[34] = True
             result /= Fs
             # Scale the spectrum by the norm of the window to compensate for
             # windowing loss; see Bendat & Piersol Sec 11.5.2.
             result /= (window**2).sum()
         else:
+            flags[35] = True
             # In this case, preserve power in the segment, not amplitude
             result /= window.sum()**2
 
     t = np.arange(NFFT/2, len(x) - NFFT/2 + 1, NFFT - noverlap)/Fs
 
     if sides == 'twosided':
+        flags[36] = True
         # center the frequency range at zero
         freqs = np.roll(freqs, -freqcenter, axis=0)
         result = np.roll(result, -freqcenter, axis=0)
     elif not pad_to % 2:
+        flags[37] = True
         # get the last value correctly, it is negative otherwise
         freqs[-1] *= -1
 
     # we unwrap the phase here to handle the onesided vs. twosided case
     if mode == 'phase':
+        flags[38] = True
         result = np.unwrap(result, axis=0)
+    
+    """
+    writing to YML-file
+    """
+    data["SPECTRAL_HELPER_ARRAY"] = flags # Change this to your array
+    with open(root_folder, "w") as f:
+        yaml.dump(data, f)
 
     return result, freqs, t
 
