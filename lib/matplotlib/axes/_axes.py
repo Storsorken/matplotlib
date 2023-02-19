@@ -1303,38 +1303,23 @@ class Axes(_AxesBase):
         --------
         .. plot:: gallery/lines_bars_and_markers/eventplot_demo.py
         """
-        #working with the YML-file
-        root_folder= Path(__file__).parents[1] / "../../flag_arrays.yml"
-        with open(root_folder) as fin:
-            data=yaml.load(fin, Loader=yaml.FullLoader)
-            flag=data["EVENTPLOT_ARRAY"]
-        if len(flag)==0:
-            flag = [False for _ in range(61)] 
 
-        
         lineoffsets, linelengths = self._process_unit_info(
                 [("y", lineoffsets), ("y", linelengths)], kwargs)
 
         # fix positions, noting that it can be a list of lists:
-        if not np.iterable(positions): #ID0
-            flag[0]=True
+        if not np.iterable(positions):
             positions = [positions]
-        elif any(np.iterable(position) for position in positions): #ID1
-            flag[1]=True
+        elif any(np.iterable(position) for position in positions):
             positions = [np.asanyarray(position) for position in positions]
-        else: #ID2
-            flag[2]=True
+        else:
             positions = [np.asanyarray(positions)]
 
-        if len(positions) == 0: #ID3
-            flag[3]=True
+        if len(positions) == 0:
             return []
-        else: #ID4
-            flag[4]=True
 
         poss = []
-        for position in positions: #ID5
-            flag[5]=True
+        for position in positions:
             poss += self._process_unit_info([("x", position)], kwargs)
         positions = poss
 
@@ -1344,154 +1329,82 @@ class Axes(_AxesBase):
         linewidths = cbook._local_over_kwdict(linewidths, kwargs, 'linewidth')
         linestyles = cbook._local_over_kwdict(linestyles, kwargs, 'linestyle')
 
-        if not np.iterable(lineoffsets): #ID6
-            flag[6]=True
+        if not np.iterable(lineoffsets):
             lineoffsets = [lineoffsets]
-        else: #ID7
-            flag[7]=True
-        if not np.iterable(linelengths): #ID8
-            flag[8]=True
+        if not np.iterable(linelengths):
             linelengths = [linelengths]
-        else: #ID9
-            flag[9]=True
-        if not np.iterable(linewidths): #ID10
-            flag[10]=True
+        if not np.iterable(linewidths):
             linewidths = [linewidths]
-        else: #ID11
-            flag[11]=True
-        if not np.iterable(colors): #ID12
-            flag[12]=True
+        if not np.iterable(colors):
             colors = [colors]
-        else: #ID13
-            flag[13]=True
-        if not np.iterable(alpha): #ID14
-            flag[14]=True
+        if not np.iterable(alpha):
             alpha = [alpha]
-        else: #ID15
-            flag[15]=True
-        if hasattr(linestyles, 'lower') or not np.iterable(linestyles): #ID16
-            flag[16]=True
+        if hasattr(linestyles, 'lower') or not np.iterable(linestyles):
             linestyles = [linestyles]
-        else: #ID17
-            flag[17]=True
 
         lineoffsets = np.asarray(lineoffsets)
         linelengths = np.asarray(linelengths)
         linewidths = np.asarray(linewidths)
 
-        if len(lineoffsets) == 0: #ID18
-            flag[18]=True
+        if len(lineoffsets) == 0:
             lineoffsets = [None]
-        else: #ID19
-            flag[19]=True
-        if len(linelengths) == 0: #ID20
-            flag[20]=True
+        if len(linelengths) == 0:
             linelengths = [None]
-        else: #ID21
-            flag[21]=True
-        if len(linewidths) == 0: #ID22
-            flag[22]=True
+        if len(linewidths) == 0:
             lineoffsets = [None]
-        else: #ID23
-            flag[23]=True
-        if len(linewidths) == 0: #ID24
-            flag[24]=True
+        if len(linewidths) == 0:
             lineoffsets = [None]
-        else: #ID25
-            flag[25]=True
-        if len(colors) == 0: #ID26
-            flag[26]=True
+        if len(colors) == 0:
             colors = [None]
-        else: #ID27
-            flag[27]=True
-        try: #ID 28
-            flag[28]=True
+        try:
             # Early conversion of the colors into RGBA values to take care
             # of cases like colors='0.5' or colors='C1'.  (Issue #8193)
             colors = mcolors.to_rgba_array(colors)
-        except ValueError: #ID29
-            flag[29]=True
+        except ValueError:
             # Will fail if any element of *colors* is None. But as long
             # as len(colors) == 1 or len(positions), the rest of the
             # code should process *colors* properly.
             pass
 
-        if len(lineoffsets) == 1 and len(positions) != 1: #ID30
-            flag[30]=True
+        if len(lineoffsets) == 1 and len(positions) != 1:
             lineoffsets = np.tile(lineoffsets, len(positions))
             lineoffsets[0] = 0
             lineoffsets = np.cumsum(lineoffsets)
-        else: #ID31
-            flag[31]=True
-        if len(linelengths) == 1: #ID32   
-            flag[32]=True
+        if len(linelengths) == 1:
             linelengths = np.tile(linelengths, len(positions))
-        else: #ID33
-            flag[33]=True
-        if len(linewidths) == 1: #ID34
-            flag[34]=True
+        if len(linewidths) == 1:
             linewidths = np.tile(linewidths, len(positions))
-        else: #ID35
-            flag[35]=True
-        if len(colors) == 1: #ID36
-            flag[36]=True
+        if len(colors) == 1:
             colors = list(colors) * len(positions)
-        else: #ID37
-                flag[37]=True
-        if len(alpha) == 1: #ID38
-            flag[38]=True
+        if len(alpha) == 1:
             alpha = list(alpha) * len(positions)
-        else: #ID39
-            flag[39]=True
-        if len(linestyles) == 1: #ID40
-            flag[40]=True
+        if len(linestyles) == 1:
             linestyles = [linestyles] * len(positions)
-        else: #ID41
-            flag[41]=True
-        if len(lineoffsets) != len(positions): #ID42
-            flag[42]=True
+
+        if len(lineoffsets) != len(positions):
             raise ValueError('lineoffsets and positions are unequal sized '
                              'sequences')
-        else: #ID43
-            flag[43]=True
-        if len(linelengths) != len(positions): #ID44
-            flag[44]=True
+        if len(linelengths) != len(positions):
             raise ValueError('linelengths and positions are unequal sized '
                              'sequences')
-        else: #ID45
-            flag[45]=True
-        if len(linewidths) != len(positions): #ID46
-            flag[46]=True
+        if len(linewidths) != len(positions):
             raise ValueError('linewidths and positions are unequal sized '
                              'sequences')
-        else:#ID47
-            flag[47]=True
-        if len(colors) != len(positions): #ID48
-            flag[48]=True
+        if len(colors) != len(positions):
             raise ValueError('colors and positions are unequal sized '
                              'sequences')
-        else: #ID49
-            flag[49]=True
-        if len(alpha) != len(positions): #ID50
-            flag[50]=True
+        if len(alpha) != len(positions):
             raise ValueError('alpha and positions are unequal sized '
                              'sequences')
-        else: #ID51
-            flag[51]=True
-        if len(linestyles) != len(positions): #ID52
-            flag[52]=True
+        if len(linestyles) != len(positions):
             raise ValueError('linestyles and positions are unequal sized '
                              'sequences')
-        else: #ID53
-            flag[53]=True
-        colls = []
 
-        #ID 54
+        colls = []
         for position, lineoffset, linelength, linewidth, color, alpha_, \
             linestyle in \
                 zip(positions, lineoffsets, linelengths, linewidths,
                     colors, alpha, linestyles):
-            flag[54]=True
             coll = mcoll.EventCollection(position,
                                          orientation=orientation,
                                          lineoffset=lineoffset,
@@ -1504,14 +1417,12 @@ class Axes(_AxesBase):
             coll._internal_update(kwargs)
             colls.append(coll)
 
-        if len(positions) > 0: #ID55
-            flag[55]=True
+        if len(positions) > 0:
             # try to get min/max
             min_max = [(np.min(_p), np.max(_p)) for _p in positions
                        if len(_p) > 0]
             # if we have any non-empty positions, try to autoscale
-            if len(min_max) > 0: #ID56
-                flag[56]=True
+            if len(min_max) > 0:
                 mins, maxes = zip(*min_max)
                 minpos = np.min(mins)
                 maxpos = np.max(maxes)
@@ -1519,23 +1430,12 @@ class Axes(_AxesBase):
                 minline = (lineoffsets - linelengths).min()
                 maxline = (lineoffsets + linelengths).max()
 
-                if orientation == "vertical": #ID57
-                    flag[57]=True
+                if orientation == "vertical":
                     corners = (minline, minpos), (maxline, maxpos)
-                else: #ID58   "horizontal" 
-                    flag[58]=True
+                else:  # "horizontal"
                     corners = (minpos, minline), (maxpos, maxline)
                 self.update_datalim(corners)
                 self._request_autoscale_view()
-            else: #ID59
-                flag[59]=True
-        else: #ID60
-            flag[60]=True
-
-        #writing to YML-file
-        data["EVENTPLOT_ARRAY"]=flag
-        with open(root_folder,"w") as f:
-            yaml.dump(data,f)
 
         return colls
 
