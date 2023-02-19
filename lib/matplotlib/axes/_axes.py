@@ -30,13 +30,11 @@ import matplotlib.ticker as mticker
 import matplotlib.transforms as mtransforms
 import matplotlib.tri as mtri
 import matplotlib.units as munits
-import yaml
 from matplotlib import _api, _docstring, _preprocess_data
 from matplotlib.axes._base import (
     _AxesBase, _TransformedBoundsLocator, _process_plot_format)
 from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
-from pathlib import Path
 
 import yaml
 from pathlib import Path
@@ -1313,10 +1311,6 @@ class Axes(_AxesBase):
         if len(flag)==0:
             flag = [False for _ in range(61)] 
 
-        #writing to YML-file
-        data["EVENTPLOT_ARRAY"]=flag
-        with open(root_folder,"w") as f:
-            yaml.dump(data,f)
         
         lineoffsets, linelengths = self._process_unit_info(
                 [("y", lineoffsets), ("y", linelengths)], kwargs)
@@ -1537,6 +1531,11 @@ class Axes(_AxesBase):
                 flag[59]=True
         else: #ID60
             flag[60]=True
+
+        #writing to YML-file
+        data["EVENTPLOT_ARRAY"]=flag
+        with open(root_folder,"w") as f:
+            yaml.dump(data,f)
 
         return colls
 
