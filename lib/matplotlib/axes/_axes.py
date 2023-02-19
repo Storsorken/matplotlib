@@ -7253,44 +7253,9 @@ such objects
             # add patches in reverse order so that when stacking,
             # items lower in the stack are plotted on top of
             # items higher in the stack
-            for x, y, color in reversed(list(zip(xvals, yvals, colors))):
-               # closed = False
-                #edgecolor = False
-                
-                if(fill):
-                    flags[80] = True
-                    closed = True
-                else:
-                    flags[81] = True
-                    closed = None
-                
-                if(fill):
-                    flags[82] = True
-                    edgecolor = None
-                else:
-                    flags[83] = True
-                    edgecolor = color
-
-                if(fill):
-                    flags[84] = True
-                    fill = fill
-                else:
-                    flags[85] = True
-                    fill = None
-
-                if(fill):
-                    flags[86] = True
-                    zorder = None 
-                else:
-                    flags[87] = True
-                    zorder = mlines.Line2D.zorder
-
-                facecolor=color
-
-                patches.append(self.fill(x[:split], y[:split],closed,facecolor,edgecolor,fill,zorder))
-                """
-                
-                patches.append(self.fill( #Unclear how to do with these statements
+            for x, y, color in reversed(list(zip(xvals, yvals, colors))):     
+                """   
+                patches.append(self.fill( 
                     x[:split], y[:split],
                     closed=True if fill else None,
                     facecolor=color,
@@ -7298,6 +7263,28 @@ such objects
                     fill=fill if fill else None,
                     zorder=None if fill else mlines.Line2D.zorder))
                 """
+
+                if fill:
+                    flags[80] = True
+                    closed = True
+                    edge_color = None
+                    fill_value = True
+                    z_order = None
+                else:
+                    flags[81] = True
+                    closed = None
+                    edge_color = color
+                    fill_value = None
+                    z_order = mlines.Line2D.zorder
+
+                patches.append(self.fill(
+                                x[:split], y[:split],
+                                closed=closed,
+                                facecolor=color,
+                                edgecolor=edge_color,
+                                fill=fill_value,
+                                zorder=z_order))
+               
             for patch_list in patches:
                 for patch in patch_list:
                     if orientation == 'vertical':
