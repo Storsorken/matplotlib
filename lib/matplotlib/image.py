@@ -26,6 +26,8 @@ from matplotlib.transforms import (
     Affine2D, BboxBase, Bbox, BboxTransform, BboxTransformTo,
     IdentityTransform, TransformedBbox)
 
+import yaml
+
 _log = logging.getLogger(__name__)
 
 # map interpolation strings to module constants
