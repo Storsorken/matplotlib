@@ -38,6 +38,9 @@ from matplotlib.axes._secondary_axes import SecondaryAxis
 from matplotlib.container import BarContainer, ErrorbarContainer, StemContainer
 from pathlib import Path
 
+import yaml
+from pathlib import Path
+
 _log = logging.getLogger(__name__)
 
 
@@ -4007,107 +4010,214 @@ class Axes(_AxesBase):
         violinplot : Draw an estimate of the probability density function.
         """
 
+        # load global branch coverage array
+        root_folder = Path(__file__).parents[1] / "../../flag_arrays.yml"
+        with open(root_folder) as fin:
+            data = yaml.load(fin, Loader=yaml.FullLoader)
+            flags = data["BOXPLOT_ARRAY"] 
+        if len(flags) == 0: # If first time loading array
+            flags = [False for _ in range(61)]
+
         # Missing arguments default to rcParams.
         if whis is None:
+            flags[0] = True
             whis = mpl.rcParams['boxplot.whiskers']
+        else: 
+            flags[1] = True
         if bootstrap is None:
+            flags[2] = True
             bootstrap = mpl.rcParams['boxplot.bootstrap']
+        else:
+            flags[3] = True
 
         bxpstats = cbook.boxplot_stats(x, whis=whis, bootstrap=bootstrap,
                                        labels=labels, autorange=autorange)
         if notch is None:
+            flags[4] = True
             notch = mpl.rcParams['boxplot.notch']
+        else: 
+            flags[5] = True
+
         if vert is None:
+            flags[6] = True
             vert = mpl.rcParams['boxplot.vertical']
+        else:
+            flags[7] = True
+        
         if patch_artist is None:
+            flags[8] = True
             patch_artist = mpl.rcParams['boxplot.patchartist']
+        else:
+            flags[9] = True
+        
         if meanline is None:
+            flags[10] = True
             meanline = mpl.rcParams['boxplot.meanline']
+        else:
+            flags[11] = True
+        
         if showmeans is None:
+            flags[12] = True
             showmeans = mpl.rcParams['boxplot.showmeans']
+        else:
+            flags[13] = True
+        
         if showcaps is None:
+            flags[14] = True
             showcaps = mpl.rcParams['boxplot.showcaps']
+        else:
+            flags[15] = True
+
         if showbox is None:
+            flags[16] = True
             showbox = mpl.rcParams['boxplot.showbox']
+        else:
+            flags[17] = True
+
         if showfliers is None:
+            flags[18] = True
             showfliers = mpl.rcParams['boxplot.showfliers']
+        else:
+            flags[19] = True
 
         if boxprops is None:
+            flags[20] = True
             boxprops = {}
+        else:
+            flags[21] = True
+
         if whiskerprops is None:
+            flags[22] = True
             whiskerprops = {}
+        else:
+            flags[23] = True
+
         if capprops is None:
+            flags[24] = True
             capprops = {}
+        else:
+            flags[25] = True
+
         if medianprops is None:
+            flags[26] = True
             medianprops = {}
+        else:
+            flags[27] = True
+
         if meanprops is None:
+            flags[28] = True
             meanprops = {}
+        else:
+            flags[29] = True
+
         if flierprops is None:
+            flags[30] = True
             flierprops = {}
+        else:
+            flags[31] = True
+
 
         if patch_artist:
+            flags[32] = True
             boxprops['linestyle'] = 'solid'  # Not consistent with bxp.
             if 'color' in boxprops:
+                flags[33] = True
                 boxprops['edgecolor'] = boxprops.pop('color')
-
+            else:
+                flags[34] = True
+        else:
+            flags[35] = True
         # if non-default sym value, put it into the flier dictionary
         # the logic for providing the default symbol ('b+') now lives
         # in bxp in the initial value of flierkw
         # handle all of the *sym* related logic here so we only have to pass
         # on the flierprops dict.
         if sym is not None:
+            flags[36] = True
             # no-flier case, which should really be done with
             # 'showfliers=False' but none-the-less deal with it to keep back
             # compatibility
             if sym == '':
+                flags[37] = True
                 # blow away existing dict and make one for invisible markers
                 flierprops = dict(linestyle='none', marker='', color='none')
                 # turn the fliers off just to be safe
                 showfliers = False
             # now process the symbol string
             else:
+                flags[38] = True
                 # process the symbol string
                 # discarded linestyle
                 _, marker, color = _process_plot_format(sym)
                 # if we have a marker, use it
                 if marker is not None:
+                    flags[39] = True
                     flierprops['marker'] = marker
+                else:
+                    flags[40] = True
                 # if we have a color, use it
                 if color is not None:
+                    flags[41] = True
                     # assume that if color is passed in the user want
                     # filled symbol, if the users want more control use
                     # flierprops
                     flierprops['color'] = color
                     flierprops['markerfacecolor'] = color
                     flierprops['markeredgecolor'] = color
+                else:
+                    flags[42] = True
+        else:
+            flags[43] = True
 
         # replace medians if necessary:
         if usermedians is not None:
+            flags[44] = True
             if (len(np.ravel(usermedians)) != len(bxpstats) or
                     np.shape(usermedians)[0] != len(bxpstats)):
+                flags[45] = True
                 raise ValueError(
                     "'usermedians' and 'x' have different lengths")
             else:
+                flags[46] = True
                 # reassign medians as necessary
                 for stats, med in zip(bxpstats, usermedians):
                     if med is not None:
+                        flags[47] = True
                         stats['med'] = med
+                    else:
+                        flags[48] = True
+        else:
+            flags[49] = True
 
         if conf_intervals is not None:
+            flags[50] = True
             if len(conf_intervals) != len(bxpstats):
+                flags[51] = True
                 raise ValueError(
                     "'conf_intervals' and 'x' have different lengths")
             else:
+                flags[52] = True
                 for stats, ci in zip(bxpstats, conf_intervals):
                     if ci is not None:
+                        flags[53] = True
                         if len(ci) != 2:
+                            flags[54] = True
                             raise ValueError('each confidence interval must '
                                              'have two values')
                         else:
+                            flags[55] = True
                             if ci[0] is not None:
+                                flags[56] = True
                                 stats['cilo'] = ci[0]
+                            else:
+                                flags[57] = True
                             if ci[1] is not None:
+                                flags[58] = True
                                 stats['cihi'] = ci[1]
+                            else:
+                                flags[59] = True
+                    else:
+                        flags[60] = True
 
         artists = self.bxp(bxpstats, positions=positions, widths=widths,
                            vert=vert, patch_artist=patch_artist,
@@ -4119,6 +4229,12 @@ class Axes(_AxesBase):
                            capprops=capprops, whiskerprops=whiskerprops,
                            manage_ticks=manage_ticks, zorder=zorder,
                            capwidths=capwidths)
+        
+        # Save to yml file
+        data["BOXPLOT_ARRAY"] = flags
+        with open(root_folder, "w") as f:
+            yaml.dump(data, f)
+
         return artists
 
     def bxp(self, bxpstats, positions=None, widths=None, vert=True,
