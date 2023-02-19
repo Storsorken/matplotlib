@@ -6904,7 +6904,7 @@ such objects
             data = yaml.load(fin, Loader=yaml.FullLoader)
             flags = data["HIST_ARRAY"] 
         if len(flags) == 0: # If first time loading array
-            flags = [False]*100
+            flags = [False]*93
         
 
         # Avoid shadowing the builtin.
@@ -7288,13 +7288,13 @@ such objects
             for patch_list in patches:
                 for patch in patch_list:
                     if orientation == 'vertical':
-                        flags[88] = True
+                        flags[82] = True
                         patch.sticky_edges.y.append(0)
                     elif orientation == 'horizontal':
-                        flags[89] = True
+                        flags[83] = True
                         patch.sticky_edges.x.append(0)
                     else:
-                        flags[90] = True
+                        flags[84] = True
 
             # we return patches, so put it back in the expected order
             patches.reverse()
@@ -7314,22 +7314,22 @@ such objects
 
         for patch, lbl in itertools.zip_longest(patches, labels):
             if patch:
-                flags[92] = True
+                flags[85] = True
                 p = patch[0]
                 p._internal_update(kwargs)
                 if lbl is not None:
-                    flags[93] = True
+                    flags[86] = True
                     p.set_label(lbl)
                 else:
-                    flags[94] = True
+                    flags[87] = True
                 for p in patch[1:]:
                     p._internal_update(kwargs)
                     p.set_label('_nolegend_')
             else:
-                flags[95] = True
+                flags[88] = True
 
         if nx == 1:
-            flags[96] = True
+            flags[89] = True
             """
             writing to YML-file
             """
@@ -7338,12 +7338,12 @@ such objects
                 yaml.dump(data, f)
             return tops[0], bins, patches[0]
         else:
-            flags[97] = True
+            flags[90] = True
             if(histtype.startswith("bar")):
-                flags[98] = True
+                flags[91] = True
                 patch_type = "BarContainer"
             else:
-                flags[99] = True
+                flags[92] = True
                 patch_type = "list[Polygon]"
       #      patch_type = ("BarContainer" if histtype.startswith("bar") #Unclear
           #                else "list[Polygon]")
