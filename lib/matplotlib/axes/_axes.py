@@ -7256,7 +7256,7 @@ such objects
             for x, y, color in reversed(list(zip(xvals, yvals, colors))):
                # closed = False
                 #edgecolor = False
-                """
+                
                 if(fill):
                     flags[80] = True
                     closed = True
@@ -7288,7 +7288,7 @@ such objects
                 facecolor=color
 
                 patches.append(self.fill(x[:split], y[:split],closed,facecolor,edgecolor,fill,zorder))
-"""
+                """
                 
                 patches.append(self.fill( #Unclear how to do with these statements
                     x[:split], y[:split],
@@ -7297,6 +7297,7 @@ such objects
                     edgecolor=None if fill else color,
                     fill=fill if fill else None,
                     zorder=None if fill else mlines.Line2D.zorder))
+                """
             for patch_list in patches:
                 for patch in patch_list:
                     if orientation == 'vertical':
