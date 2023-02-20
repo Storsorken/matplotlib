@@ -3607,7 +3607,7 @@ class Axes(_AxesBase):
                 data=yaml.load(fin, Loader=yaml.FullLoader)
                 flag=data["ERRORBAR_ARRAY"]
             if len(flag)==0:
-                flag = [False for _ in range(61)]
+                flag = [False for _ in range(29)]
 
             kwargs = cbook.normalize_kwargs(kwargs, mlines.Line2D)
             # Drop anything that comes in as None to use the default instead.
@@ -3867,13 +3867,12 @@ class Axes(_AxesBase):
                 has_xerr=(xerr is not None), has_yerr=(yerr is not None),
                 label=label)
             self.containers.append(errorbar_container)
-        
+            return errorbar_container  # (l0, caplines, barcols)
         finally:
             # Save to yml file
             data["ERRORBAR_ARRAY"] = flag
             with open(root_folder, "w") as f:
                 yaml.dump(data, f)
-            return errorbar_container  # (l0, caplines, barcols)
 
     @_preprocess_data()
     def boxplot(self, x, notch=None, sym=None, vert=None, whis=None,

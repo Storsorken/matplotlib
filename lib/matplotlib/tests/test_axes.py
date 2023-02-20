@@ -3747,20 +3747,28 @@ def test_mixed_errorbar_polar_caps():
     r_over = [3.1]
     ax.errorbar(th_over, r_over, xerr=10, yerr=.2, fmt="o")
 
-
+# Added barsabove as argument to this to fulfill flag 7
 def test_errorbar_colorcycle():
 
     f, ax = plt.subplots()
     x = np.arange(10)
     y = 2*x
-
-    e1, _, _ = ax.errorbar(x, y, c=None)
-    e2, _, _ = ax.errorbar(x, 2*y, c=None)
+    e1, _, _ = ax.errorbar(x, y, c=None, barsabove=True)
+    e2, _, _ = ax.errorbar(x, 2*y, c=None, barsabove=True)
     ln1, = ax.plot(x, 4*y)
 
     assert mcolors.to_rgba(e1.get_color()) == mcolors.to_rgba('C0')
     assert mcolors.to_rgba(e2.get_color()) == mcolors.to_rgba('C1')
     assert mcolors.to_rgba(ln1.get_color()) == mcolors.to_rgba('C2')
+
+# Added to fulfil flag 6
+def test_errorbar_valueerror():
+    with pytest.raises(Exception) as excinfo:   
+        f, ax = plt.subplots()
+        x = np.arange(10)
+        y = np.arange(12)
+        ax.errorbar(x, y, c=None)
+    assert str(excinfo.value) == "'x' and 'y' must have the same size"
 
 
 @check_figures_equal()
