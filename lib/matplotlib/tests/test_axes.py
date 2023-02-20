@@ -3190,6 +3190,19 @@ def test_boxplot():
     ax.set_ylim((-30, 30))
 
 
+@image_comparison(['boxplot_with_patch_artist.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_with_patch_artist_and_color():
+    # patch_artist argument works and takes into account boxprop color
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    ax.boxplot([x, x], patch_artist=True, boxprops={'color':'r'})
+    ax.set_ylim((-10, 10))
+
+
 @image_comparison(['boxplot_custom_capwidths.png'],
                   savefig_kwarg={'dpi': 40}, style='default')
 def test_boxplot_custom_capwidths():
