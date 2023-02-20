@@ -3201,6 +3201,20 @@ def test_boxplot_custom_capwidths():
     ax.boxplot([x, x], notch=1, capwidths=[0.01, 0.2])
 
 
+@image_comparison(['boxplot_sym3.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_sym3():
+    # fliers are properly hidden
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+
+    ax.boxplot([x, x], sym='')
+    ax.set_ylim((-30, 30))
+
+
 @image_comparison(['boxplot_sym2.png'], remove_text=True, style='default')
 def test_boxplot_sym2():
     # Randomness used for bootstrapping.
