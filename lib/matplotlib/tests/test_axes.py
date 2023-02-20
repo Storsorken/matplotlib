@@ -8431,3 +8431,36 @@ def test_zorder_and_explicit_rasterization():
     ln, = ax.plot(range(5), rasterized=True, zorder=1)
     with io.BytesIO() as b:
         fig.savefig(b, format='pdf')
+
+# Test hist function with density = True and cumulative = True
+def test_cumulative_histogram_with_density():
+    #Create randomly distributed data
+    x = np.random.normal(0, 100, 100)
+  
+    #Create histogram with density (data 0-1) and that has data in cumulative order
+    n,_,_ = plt.hist(x,density=True,cumulative=True)
+
+    #Copy and sort the recieved data
+    n_sorted = np.copy(n)
+    n_sorted.sort()
+
+    #Last element should be 1 (density, cumulative)
+    assert n[-1] == 1
+    #Recieved data should be sorted (cumulative order)
+    assert_array_equal(n,n_sorted)
+
+# Test hist function with cumulative = -1
+def test_reverse_cumulative_histogram_without_density():
+    #Create randomly distributed data
+    x = np.random.normal(50, 50, 100)
+
+    #Create histogram with reverse cumulative order
+    n,_,_ = plt.hist(x,cumulative=-1)
+
+    #Create copy of recieved and sort it in descending order
+    n_sorted_descending = np.copy(n)
+    n_sorted_descending.sort()
+    n_sorted_descending = n_sorted_descending[::-1]
+
+    #Recieved data should be sorted in descending order (reverse cumulative order)
+    assert_array_equal(n,n_sorted_descending)
