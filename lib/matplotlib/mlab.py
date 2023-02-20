@@ -309,7 +309,7 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
         flags = [False for _ in range(39)]
 
     if y is None:
-        flags[0] = False
+        flags[0] = True
         # if y is None use x for y
         same_data = True
     else:
@@ -497,7 +497,7 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     """
     writing to YML-file
     """
-    data["SPECTRAL_HELPER_ARRAY"] = flags # Change this to your array
+    data["SPECTRAL_HELPER_ARRAY"] = flags # Change SPECTRAL_HELPER_ARRAY to your array
     with open(root_folder, "w") as f:
         yaml.dump(data, f)
 
