@@ -4636,7 +4636,7 @@ def test_eventplot_problem_kwargs(recwarn):
 
 def test_empty_eventplot():
     fig, ax = plt.subplots(1, 1)
-    ax.eventplot([[]], colors=[(0.0, 0.0, 0.0, 0.0)])
+    res=ax.eventplot([[]], colors=[(0.0, 0.0, 0.0, 0.0)])
     plt.draw()
 
 
@@ -4663,6 +4663,22 @@ def test_eventplot_units_list(fig_test, fig_ref):
 
     ax = fig_test.subplots()
     ax.eventplot([ts_1, ts_2])
+
+#test added to improve branch coverage of eventplot function
+#tests that if lineLengths and positions are of different size, an error is thrown
+def test_valueError_for_linelengths():
+    fig, ax = plt.subplots()
+    lineL= [1, 1]
+    with pytest.raises(ValueError, match="linelengths and positions are unequal sized sequences"):
+        ax.eventplot(positions=[1],linelengths=lineL)
+
+#test added to improve branch coverage of eventplot function
+#tests that if linewidths and positions are of different size, an error is thrown
+def test_valueError_for_linewidths():
+    fig, ax = plt.subplots()
+    lineW= [1, 1]
+    with pytest.raises(ValueError, match="linewidths and positions are unequal sized sequences"):
+        ax.eventplot(positions=[1],linewidths=lineW)
 
 
 @image_comparison(['marker_styles.png'], remove_text=True)
