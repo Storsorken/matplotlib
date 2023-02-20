@@ -3747,20 +3747,28 @@ def test_mixed_errorbar_polar_caps():
     r_over = [3.1]
     ax.errorbar(th_over, r_over, xerr=10, yerr=.2, fmt="o")
 
-
+# Added barsabove as argument to this to fulfill flag 7
 def test_errorbar_colorcycle():
 
     f, ax = plt.subplots()
     x = np.arange(10)
     y = 2*x
-
-    e1, _, _ = ax.errorbar(x, y, c=None)
-    e2, _, _ = ax.errorbar(x, 2*y, c=None)
+    e1, _, _ = ax.errorbar(x, y, c=None, barsabove=True)
+    e2, _, _ = ax.errorbar(x, 2*y, c=None, barsabove=True)
     ln1, = ax.plot(x, 4*y)
 
     assert mcolors.to_rgba(e1.get_color()) == mcolors.to_rgba('C0')
     assert mcolors.to_rgba(e2.get_color()) == mcolors.to_rgba('C1')
     assert mcolors.to_rgba(ln1.get_color()) == mcolors.to_rgba('C2')
+
+# Added to fulfil flag 6
+def test_errorbar_valueerror():
+    with pytest.raises(Exception) as excinfo:   
+        f, ax = plt.subplots()
+        x = np.arange(10)
+        y = np.arange(12)
+        ax.errorbar(x, y, c=None)
+    assert str(excinfo.value) == "'x' and 'y' must have the same size"
 
 
 @check_figures_equal()
@@ -4636,7 +4644,7 @@ def test_eventplot_problem_kwargs(recwarn):
 
 def test_empty_eventplot():
     fig, ax = plt.subplots(1, 1)
-    ax.eventplot([[]], colors=[(0.0, 0.0, 0.0, 0.0)])
+    res=ax.eventplot([[]], colors=[(0.0, 0.0, 0.0, 0.0)])
     plt.draw()
 
 
@@ -4663,6 +4671,22 @@ def test_eventplot_units_list(fig_test, fig_ref):
 
     ax = fig_test.subplots()
     ax.eventplot([ts_1, ts_2])
+
+#test added to improve branch coverage of eventplot function
+#tests that if lineLengths and positions are of different size, an error is thrown
+def test_valueError_for_linelengths():
+    fig, ax = plt.subplots()
+    lineL= [1, 1]
+    with pytest.raises(ValueError, match="linelengths and positions are unequal sized sequences"):
+        ax.eventplot(positions=[1],linelengths=lineL)
+
+#test added to improve branch coverage of eventplot function
+#tests that if linewidths and positions are of different size, an error is thrown
+def test_valueError_for_linewidths():
+    fig, ax = plt.subplots()
+    lineW= [1, 1]
+    with pytest.raises(ValueError, match="linewidths and positions are unequal sized sequences"):
+        ax.eventplot(positions=[1],linewidths=lineW)
 
 
 @image_comparison(['marker_styles.png'], remove_text=True)

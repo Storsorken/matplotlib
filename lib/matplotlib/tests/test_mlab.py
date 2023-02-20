@@ -507,7 +507,19 @@ class TestSpectral:
         assert_allclose(t, getattr(self, f"t_{case}"), atol=1e-06)
         assert spec.shape[0] == freqs.shape[0]
         assert spec.shape[1] == getattr(self, f"t_{case}").shape[0]
-
+    
+    def test_spectral_helper_diff_data_mode_magnitude(self):
+        with pytest.raises(Exception) as excinfo:   
+            mlab._spectral_helper(
+            x=[1,2], y=[2,3], mode='magnitude')   
+        assert str(excinfo.value) == "x and y must be equal if mode is not 'psd'"
+    
+    def test_spectral_helper_len_window_not_equal_NFFT(self):
+        with pytest.raises(Exception) as excinfo:   
+            mlab._spectral_helper(
+            x=[1,2,5,1,2], y=[2,3,2,1,3], mode='psd', window=np.ones(3), NFFT=255)   
+        assert str(excinfo.value) == "The window length must match the data's first dimension"
+    
     def test_csd(self):
         freqs = self.freqs_density
         spec, fsp = mlab.csd(x=self.y, y=self.y+1,
