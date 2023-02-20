@@ -371,12 +371,18 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
 
         if A is None:
             flags[0] = True
+            data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             raise RuntimeError('You must first set the image '
                                'array or the image attribute')
         else:
             flags[1] = True
         if A.size == 0:
             flags[2] = True
+            data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             raise RuntimeError("_make_image must get a non-empty image. "
                                "Your Artist's draw method must filter before "
                                "this method is called.")
@@ -387,6 +393,9 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
 
         if clipped_bbox is None:
             flags[4] = True
+            data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             return None, 0, 0, None
         else:
             flags[5] = True
@@ -396,6 +405,9 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
 
         if out_width_base == 0 or out_height_base == 0:
             flags[6] = True
+            data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             return None, 0, 0, None
         else:
             flags[7] = True
@@ -444,6 +456,9 @@ class _ImageBase(martist.Artist, cm.ScalarMappable):
             flags[12] = True
             if not (A.ndim == 2 or A.ndim == 3 and A.shape[-1] in (3, 4)):
                 flags[13] = True
+                data["MAKE_IMAGE_ARRAY"] = flags # Change this to your array
+                with open(root_folder, "w") as f:
+                    yaml.dump(data, f)
                 raise ValueError(f"Invalid shape {A.shape} for image data")
             else:
                 flags[14] = True

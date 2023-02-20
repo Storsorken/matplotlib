@@ -1303,23 +1303,38 @@ class Axes(_AxesBase):
         --------
         .. plot:: gallery/lines_bars_and_markers/eventplot_demo.py
         """
+        #working with the YML-file
+        root_folder= Path(__file__).parents[1] / "../../flag_arrays.yml"
+        with open(root_folder) as fin:
+            data=yaml.load(fin, Loader=yaml.FullLoader)
+            flag=data["EVENTPLOT_ARRAY"]
+        if len(flag)==0:
+            flag = [False for _ in range(61)] 
 
+        
         lineoffsets, linelengths = self._process_unit_info(
                 [("y", lineoffsets), ("y", linelengths)], kwargs)
 
         # fix positions, noting that it can be a list of lists:
-        if not np.iterable(positions):
+        if not np.iterable(positions): #ID0
+            flag[0]=True
             positions = [positions]
-        elif any(np.iterable(position) for position in positions):
+        elif any(np.iterable(position) for position in positions): #ID1
+            flag[1]=True
             positions = [np.asanyarray(position) for position in positions]
-        else:
+        else: #ID2
+            flag[2]=True
             positions = [np.asanyarray(positions)]
 
-        if len(positions) == 0:
+        if len(positions) == 0: #ID3
+            flag[3]=True
             return []
+        else: #ID4
+            flag[4]=True
 
         poss = []
-        for position in positions:
+        for position in positions: #ID5
+            flag[5]=True
             poss += self._process_unit_info([("x", position)], kwargs)
         positions = poss
 
@@ -1329,82 +1344,154 @@ class Axes(_AxesBase):
         linewidths = cbook._local_over_kwdict(linewidths, kwargs, 'linewidth')
         linestyles = cbook._local_over_kwdict(linestyles, kwargs, 'linestyle')
 
-        if not np.iterable(lineoffsets):
+        if not np.iterable(lineoffsets): #ID6
+            flag[6]=True
             lineoffsets = [lineoffsets]
-        if not np.iterable(linelengths):
+        else: #ID7
+            flag[7]=True
+        if not np.iterable(linelengths): #ID8
+            flag[8]=True
             linelengths = [linelengths]
-        if not np.iterable(linewidths):
+        else: #ID9
+            flag[9]=True
+        if not np.iterable(linewidths): #ID10
+            flag[10]=True
             linewidths = [linewidths]
-        if not np.iterable(colors):
+        else: #ID11
+            flag[11]=True
+        if not np.iterable(colors): #ID12
+            flag[12]=True
             colors = [colors]
-        if not np.iterable(alpha):
+        else: #ID13
+            flag[13]=True
+        if not np.iterable(alpha): #ID14
+            flag[14]=True
             alpha = [alpha]
-        if hasattr(linestyles, 'lower') or not np.iterable(linestyles):
+        else: #ID15
+            flag[15]=True
+        if hasattr(linestyles, 'lower') or not np.iterable(linestyles): #ID16
+            flag[16]=True
             linestyles = [linestyles]
+        else: #ID17
+            flag[17]=True
 
         lineoffsets = np.asarray(lineoffsets)
         linelengths = np.asarray(linelengths)
         linewidths = np.asarray(linewidths)
 
-        if len(lineoffsets) == 0:
+        if len(lineoffsets) == 0: #ID18
+            flag[18]=True
             lineoffsets = [None]
-        if len(linelengths) == 0:
+        else: #ID19
+            flag[19]=True
+        if len(linelengths) == 0: #ID20
+            flag[20]=True
             linelengths = [None]
-        if len(linewidths) == 0:
+        else: #ID21
+            flag[21]=True
+        if len(linewidths) == 0: #ID22
+            flag[22]=True
             lineoffsets = [None]
-        if len(linewidths) == 0:
+        else: #ID23
+            flag[23]=True
+        if len(linewidths) == 0: #ID24
+            flag[24]=True
             lineoffsets = [None]
-        if len(colors) == 0:
+        else: #ID25
+            flag[25]=True
+        if len(colors) == 0: #ID26
+            flag[26]=True
             colors = [None]
-        try:
+        else: #ID27
+            flag[27]=True
+        try: #ID 28
+            flag[28]=True
             # Early conversion of the colors into RGBA values to take care
             # of cases like colors='0.5' or colors='C1'.  (Issue #8193)
             colors = mcolors.to_rgba_array(colors)
-        except ValueError:
+        except ValueError: #ID29
+            flag[29]=True
             # Will fail if any element of *colors* is None. But as long
             # as len(colors) == 1 or len(positions), the rest of the
             # code should process *colors* properly.
             pass
 
-        if len(lineoffsets) == 1 and len(positions) != 1:
+        if len(lineoffsets) == 1 and len(positions) != 1: #ID30
+            flag[30]=True
             lineoffsets = np.tile(lineoffsets, len(positions))
             lineoffsets[0] = 0
             lineoffsets = np.cumsum(lineoffsets)
-        if len(linelengths) == 1:
+        else: #ID31
+            flag[31]=True
+        if len(linelengths) == 1: #ID32   
+            flag[32]=True
             linelengths = np.tile(linelengths, len(positions))
-        if len(linewidths) == 1:
+        else: #ID33
+            flag[33]=True
+        if len(linewidths) == 1: #ID34
+            flag[34]=True
             linewidths = np.tile(linewidths, len(positions))
-        if len(colors) == 1:
+        else: #ID35
+            flag[35]=True
+        if len(colors) == 1: #ID36
+            flag[36]=True
             colors = list(colors) * len(positions)
-        if len(alpha) == 1:
+        else: #ID37
+                flag[37]=True
+        if len(alpha) == 1: #ID38
+            flag[38]=True
             alpha = list(alpha) * len(positions)
-        if len(linestyles) == 1:
+        else: #ID39
+            flag[39]=True
+        if len(linestyles) == 1: #ID40
+            flag[40]=True
             linestyles = [linestyles] * len(positions)
-
-        if len(lineoffsets) != len(positions):
+        else: #ID41
+            flag[41]=True
+        if len(lineoffsets) != len(positions): #ID42
+            flag[42]=True
             raise ValueError('lineoffsets and positions are unequal sized '
                              'sequences')
-        if len(linelengths) != len(positions):
+        else: #ID43
+            flag[43]=True
+        if len(linelengths) != len(positions): #ID44
+            flag[44]=True
             raise ValueError('linelengths and positions are unequal sized '
                              'sequences')
-        if len(linewidths) != len(positions):
+        else: #ID45
+            flag[45]=True
+        if len(linewidths) != len(positions): #ID46
+            flag[46]=True
             raise ValueError('linewidths and positions are unequal sized '
                              'sequences')
-        if len(colors) != len(positions):
+        else:#ID47
+            flag[47]=True
+        if len(colors) != len(positions): #ID48
+            flag[48]=True
             raise ValueError('colors and positions are unequal sized '
                              'sequences')
-        if len(alpha) != len(positions):
+        else: #ID49
+            flag[49]=True
+        if len(alpha) != len(positions): #ID50
+            flag[50]=True
             raise ValueError('alpha and positions are unequal sized '
                              'sequences')
-        if len(linestyles) != len(positions):
+        else: #ID51
+            flag[51]=True
+        if len(linestyles) != len(positions): #ID52
+            flag[52]=True
             raise ValueError('linestyles and positions are unequal sized '
                              'sequences')
-
+        else: #ID53
+            flag[53]=True
         colls = []
+
+        #ID 54
         for position, lineoffset, linelength, linewidth, color, alpha_, \
             linestyle in \
                 zip(positions, lineoffsets, linelengths, linewidths,
                     colors, alpha, linestyles):
+            flag[54]=True
             coll = mcoll.EventCollection(position,
                                          orientation=orientation,
                                          lineoffset=lineoffset,
@@ -1417,12 +1504,14 @@ class Axes(_AxesBase):
             coll._internal_update(kwargs)
             colls.append(coll)
 
-        if len(positions) > 0:
+        if len(positions) > 0: #ID55
+            flag[55]=True
             # try to get min/max
             min_max = [(np.min(_p), np.max(_p)) for _p in positions
                        if len(_p) > 0]
             # if we have any non-empty positions, try to autoscale
-            if len(min_max) > 0:
+            if len(min_max) > 0: #ID56
+                flag[56]=True
                 mins, maxes = zip(*min_max)
                 minpos = np.min(mins)
                 maxpos = np.max(maxes)
@@ -1430,12 +1519,23 @@ class Axes(_AxesBase):
                 minline = (lineoffsets - linelengths).min()
                 maxline = (lineoffsets + linelengths).max()
 
-                if orientation == "vertical":
+                if orientation == "vertical": #ID57
+                    flag[57]=True
                     corners = (minline, minpos), (maxline, maxpos)
-                else:  # "horizontal"
+                else: #ID58   "horizontal" 
+                    flag[58]=True
                     corners = (minpos, minline), (maxpos, maxline)
                 self.update_datalim(corners)
                 self._request_autoscale_view()
+            else: #ID59
+                flag[59]=True
+        else: #ID60
+            flag[60]=True
+
+        #writing to YML-file
+        data["EVENTPLOT_ARRAY"]=flag
+        with open(root_folder,"w") as f:
+            yaml.dump(data,f)
 
         return colls
 
@@ -6794,15 +6894,34 @@ such objects
         if *histtype* is set to 'step' or 'stepfilled' rather than 'bar' or
         'barstacked'.
         """
+
+        """
+        working with the YML-file
+        """
+ 
+        root_folder = Path(__file__).parents[1] / "../../flag_arrays.yml"
+        with open(root_folder) as fin:
+            data = yaml.load(fin, Loader=yaml.FullLoader)
+            flags = data["HIST_ARRAY"] 
+        if len(flags) == 0: # If first time loading array
+            flags = [False]*93
+        
+
         # Avoid shadowing the builtin.
         bin_range = range
         from builtins import range
-
-        if np.isscalar(x):
+        
+        if np.isscalar(x): 
+            flags[0] = True
             x = [x]
+        else:
+            flags[1] = True
 
         if bins is None:
+            flags[2] = True
             bins = mpl.rcParams['hist.bins']
+        else:
+            flags[3] = True
 
         # Validate string inputs here to avoid cluttering subsequent code.
         _api.check_in_list(['bar', 'barstacked', 'step', 'stepfilled'],
@@ -6811,7 +6930,10 @@ such objects
         _api.check_in_list(['horizontal', 'vertical'], orientation=orientation)
 
         if histtype == 'barstacked' and not stacked:
+            flags[4] = True
             stacked = True
+        else:
+            flags[5] = True
 
         # Massage 'x' for processing.
         x = cbook._reshape_2D(x, 'x')
@@ -6821,45 +6943,69 @@ such objects
         # converts the first dataset; then we convert each following dataset
         # one at a time.
         if orientation == "vertical":
+            flags[6] = True
             convert_units = self.convert_xunits
             x = [*self._process_unit_info([("x", x[0])], kwargs),
                  *map(convert_units, x[1:])]
         else:  # horizontal
+            flags[7] = True
             convert_units = self.convert_yunits
             x = [*self._process_unit_info([("y", x[0])], kwargs),
                  *map(convert_units, x[1:])]
 
         if bin_range is not None:
+            flags[8] = True
             bin_range = convert_units(bin_range)
+        else:
+            flags[9] = True
 
         if not cbook.is_scalar_or_string(bins):
+            flags[10] = True
             bins = convert_units(bins)
+        else:
+            flags[11] = True
 
         # We need to do to 'weights' what was done to 'x'
         if weights is not None:
+            flags[12] = True
             w = cbook._reshape_2D(weights, 'weights')
         else:
+            flags[13] = True
             w = [None] * nx
 
         if len(w) != nx:
+            flags[14] = True
             raise ValueError('weights should have the same shape as x')
+        else:
+            flags[15] = True
 
         input_empty = True
         for xi, wi in zip(x, w):
             len_xi = len(xi)
             if wi is not None and len(wi) != len_xi:
+                flags[16] = True
                 raise ValueError('weights should have the same shape as x')
+            else:
+                flags[17] = True
             if len_xi:
+                flags[18] = True
                 input_empty = False
+            else:
+                flags[19] = True
 
         if color is None:
+            flags[20] = True
             colors = [self._get_lines.get_next_color() for i in range(nx)]
         else:
+            flags[21] = True
             colors = mcolors.to_rgba_array(color)
             if len(colors) != nx:
+                flags[22] = True
                 raise ValueError(f"The 'color' keyword argument must have one "
                                  f"color per dataset, but {nx} datasets and "
                                  f"{len(colors)} colors were provided")
+            else:
+                flags[23] = True
 
         hist_kwargs = dict()
 
@@ -6867,33 +7013,47 @@ such objects
         # does not do this for us when guessing the range (but will
         # happily ignore nans when computing the histogram).
         if bin_range is None:
+            flags[24] = True
             xmin = np.inf
             xmax = -np.inf
             for xi in x:
                 if len(xi):
+                    flags[25] = True
                     # python's min/max ignore nan,
                     # np.minnan returns nan for all nan input
                     xmin = min(xmin, np.nanmin(xi))
                     xmax = max(xmax, np.nanmax(xi))
+                else:
+                    flags[26] = True
             if xmin <= xmax:  # Only happens if we have seen a finite value.
+                flags[27] = True
                 bin_range = (xmin, xmax)
+            else:
+                flags[28] = True
 
         # If bins are not specified either explicitly or via range,
         # we need to figure out the range required for all datasets,
         # and supply that to np.histogram.
         if not input_empty and len(x) > 1:
+            flags[29] = True
             if weights is not None:
+                flags[30] = True
                 _w = np.concatenate(w)
             else:
+                flags[31] = True
                 _w = None
             bins = np.histogram_bin_edges(
                 np.concatenate(x), bins, bin_range, _w)
         else:
+            flags[32] = True
             hist_kwargs['range'] = bin_range
 
         density = bool(density)
         if density and not stacked:
+            flags[33] = True
             hist_kwargs['density'] = density
+        else:
+            flags[34] = True
 
         # List to store all the top coordinates of the histograms
         tops = []  # Will have shape (n_datasets, n_bins).
@@ -6906,67 +7066,103 @@ such objects
         tops = np.array(tops, float)  # causes problems later if it's an int
         bins = np.array(bins, float)  # causes problems if float16
         if stacked:
+            flags[35] = True
             tops = tops.cumsum(axis=0)
             # If a stacked density plot, normalize so the area of all the
             # stacked histograms together is 1
             if density:
+                flags[36] = True
                 tops = (tops / np.diff(bins)) / tops[-1].sum()
+            else:
+                flags[37] = True
+        else:
+            flags[38] = True
+        
         if cumulative:
+            flags[39] = True
             slc = slice(None)
             if isinstance(cumulative, Number) and cumulative < 0:
+                flags[40] = True
                 slc = slice(None, None, -1)
+            else:
+                flags[41] = True
             if density:
+                flags[42] = True
                 tops = (tops * np.diff(bins))[:, slc].cumsum(axis=1)[:, slc]
             else:
+                flags[43] = True
                 tops = tops[:, slc].cumsum(axis=1)[:, slc]
+        else:
+            flags[44] = True
 
         patches = []
 
         if histtype.startswith('bar'):
-
+            flags[46] = True
             totwidth = np.diff(bins)
 
             if rwidth is not None:
+                flags[47] = True
                 dr = np.clip(rwidth, 0, 1)
             elif (len(tops) > 1 and
                   ((not stacked) or mpl.rcParams['_internal.classic_mode'])):
+                flags[48] = True
                 dr = 0.8
             else:
+                flags[49] = True
                 dr = 1.0
 
             if histtype == 'bar' and not stacked:
+                flags[50] = True
                 width = dr * totwidth / nx
                 dw = width
                 boffset = -0.5 * dr * totwidth * (1 - 1 / nx)
             elif histtype == 'barstacked' or stacked:
+                flags[51] = True
                 width = dr * totwidth
                 boffset, dw = 0.0, 0.0
+            else:
+                flags[52] = True
 
             if align == 'mid':
+                flags[53] = True
                 boffset += 0.5 * totwidth
             elif align == 'right':
+                flags[54] = True
                 boffset += totwidth
+            else:
+                flags[55] = True
 
             if orientation == 'horizontal':
+                flags[56] = True
                 _barfunc = self.barh
                 bottom_kwarg = 'left'
             else:  # orientation == 'vertical'
+                flags[57] = True
                 _barfunc = self.bar
                 bottom_kwarg = 'bottom'
 
             for top, color in zip(tops, colors):
                 if bottom is None:
+                    flags[58] = True
                     bottom = np.zeros(len(top))
+                else:
+                    flags[59] = True
                 if stacked:
+                    flags[60] = True
                     height = top - bottom
                 else:
+                    flags[61] = True
                     height = top
                 bars = _barfunc(bins[:-1]+boffset, height, width,
                                 align='center', log=log,
                                 color=color, **{bottom_kwarg: bottom})
                 patches.append(bars)
                 if stacked:
+                    flags[62] = True
                     bottom = top
+                else:
+                    flags[63] = True
                 boffset += dw
             # Remove stickies from all bars but the lowest ones, as otherwise
             # margin expansion would be unable to cross the stickies in the
@@ -6976,6 +7172,7 @@ such objects
                     patch.sticky_edges.x[:] = patch.sticky_edges.y[:] = []
 
         elif histtype.startswith('step'):
+            flags[64] = True
             # these define the perimeter of the polygon
             x = np.zeros(4 * len(bins) - 3)
             y = np.zeros(4 * len(bins) - 3)
@@ -6984,21 +7181,33 @@ such objects
             x[2*len(bins)-1:] = x[1:2*len(bins)-1][::-1]
 
             if bottom is None:
+                flags[65] = True
                 bottom = 0
+            else:
+                flags[66] = True
 
             y[1:2*len(bins)-1:2] = y[2:2*len(bins):2] = bottom
             y[2*len(bins)-1:] = y[1:2*len(bins)-1][::-1]
 
             if log:
+                flags[67] = True
                 if orientation == 'horizontal':
+                    flags[68] = True
                     self.set_xscale('log', nonpositive='clip')
                 else:  # orientation == 'vertical'
+                    flags[69] = True
                     self.set_yscale('log', nonpositive='clip')
+            else:
+                flags[70] = True
 
             if align == 'left':
+                flags[71] = True
                 x -= 0.5*(bins[1]-bins[0])
             elif align == 'right':
+                flags[72] = True
                 x += 0.5*(bins[1]-bins[0])
+            else:
+                flags[73] = True
 
             # If fill kwarg is set, it will be passed to the patch collection,
             # overriding this
@@ -7007,8 +7216,11 @@ such objects
             xvals, yvals = [], []
             for top in tops:
                 if stacked:
+                    flags[74] = True
                     # top of the previous polygon becomes the bottom
                     y[2*len(bins)-1:] = y[1:2*len(bins)-1][::-1]
+                else:
+                    flags[75] = True
                 # set the top of this polygon
                 y[1:2*len(bins)-1:2] = y[2:2*len(bins):2] = top + bottom
 
@@ -7019,53 +7231,128 @@ such objects
                 y[0] = y[-1]
 
                 if orientation == 'horizontal':
+                    flags[76] = True
                     xvals.append(y.copy())
                     yvals.append(x.copy())
                 else:
+                    flags[77] = True
                     xvals.append(x.copy())
                     yvals.append(y.copy())
 
             # stepfill is closed, step is not
-            split = -1 if fill else 2 * len(bins)
+            split = 0
+            if(fill):
+                flags[78] = True
+                split = -1
+            else:
+                flags[79] = True
+                split = 2*len(bins)
+
+            #split = -1 if fill else 2 * len(bins)
+
             # add patches in reverse order so that when stacking,
             # items lower in the stack are plotted on top of
             # items higher in the stack
-            for x, y, color in reversed(list(zip(xvals, yvals, colors))):
-                patches.append(self.fill(
+            for x, y, color in reversed(list(zip(xvals, yvals, colors))):     
+                """   
+                patches.append(self.fill( 
                     x[:split], y[:split],
                     closed=True if fill else None,
                     facecolor=color,
                     edgecolor=None if fill else color,
                     fill=fill if fill else None,
                     zorder=None if fill else mlines.Line2D.zorder))
+                """
+
+                if fill:
+                    flags[80] = True
+                    closed = True
+                    edge_color = None
+                    fill_value = True
+                    z_order = None
+                else:
+                    flags[81] = True
+                    closed = None
+                    edge_color = color
+                    fill_value = None
+                    z_order = mlines.Line2D.zorder
+
+                patches.append(self.fill(
+                                x[:split], y[:split],
+                                closed=closed,
+                                facecolor=color,
+                                edgecolor=edge_color,
+                                fill=fill_value,
+                                zorder=z_order))
+               
             for patch_list in patches:
                 for patch in patch_list:
                     if orientation == 'vertical':
+                        flags[82] = True
                         patch.sticky_edges.y.append(0)
                     elif orientation == 'horizontal':
+                        flags[83] = True
                         patch.sticky_edges.x.append(0)
+                    else:
+                        flags[84] = True
 
             # we return patches, so put it back in the expected order
             patches.reverse()
 
+        else:
+            flags[91] = True
+
         # If None, make all labels None (via zip_longest below); otherwise,
         # cast each element to str, but keep a single str as it.
-        labels = [] if label is None else np.atleast_1d(np.asarray(label, str))
+
+        if(label is None):
+            labels = []
+        else:
+            labels = np.atleast_1d(np.asarray(label, str))
+
+       # labels = [] if label is None else np.atleast_1d(np.asarray(label, str)) #Unclear
+
         for patch, lbl in itertools.zip_longest(patches, labels):
             if patch:
+                flags[85] = True
                 p = patch[0]
                 p._internal_update(kwargs)
                 if lbl is not None:
+                    flags[86] = True
                     p.set_label(lbl)
+                else:
+                    flags[87] = True
                 for p in patch[1:]:
                     p._internal_update(kwargs)
                     p.set_label('_nolegend_')
+            else:
+                flags[88] = True
 
         if nx == 1:
+            flags[89] = True
+            """
+            writing to YML-file
+            """
+            data["HIST_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             return tops[0], bins, patches[0]
         else:
-            patch_type = ("BarContainer" if histtype.startswith("bar")
-                          else "list[Polygon]")
+            flags[90] = True
+            if(histtype.startswith("bar")):
+                flags[91] = True
+                patch_type = "BarContainer"
+            else:
+                flags[92] = True
+                patch_type = "list[Polygon]"
+      #      patch_type = ("BarContainer" if histtype.startswith("bar") #Unclear
+          #                else "list[Polygon]")
+            """
+            writing to YML-file
+            """
+            data["HIST_ARRAY"] = flags # Change this to your array
+            with open(root_folder, "w") as f:
+                yaml.dump(data, f)
             return tops, bins, cbook.silent_list(patch_type, patches)
 
     @_preprocess_data()
