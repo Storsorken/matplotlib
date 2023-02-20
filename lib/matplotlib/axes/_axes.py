@@ -1328,6 +1328,9 @@ class Axes(_AxesBase):
 
         if len(positions) == 0: #ID3
             flag[3]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             return []
         else: #ID4
             flag[4]=True
@@ -1343,7 +1346,6 @@ class Axes(_AxesBase):
         colors = cbook._local_over_kwdict(colors, kwargs, 'color')
         linewidths = cbook._local_over_kwdict(linewidths, kwargs, 'linewidth')
         linestyles = cbook._local_over_kwdict(linestyles, kwargs, 'linestyle')
-
         if not np.iterable(lineoffsets): #ID6
             flag[6]=True
             lineoffsets = [lineoffsets]
@@ -1450,36 +1452,54 @@ class Axes(_AxesBase):
             flag[41]=True
         if len(lineoffsets) != len(positions): #ID42
             flag[42]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('lineoffsets and positions are unequal sized '
                              'sequences')
         else: #ID43
             flag[43]=True
         if len(linelengths) != len(positions): #ID44
             flag[44]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('linelengths and positions are unequal sized '
                              'sequences')
         else: #ID45
             flag[45]=True
         if len(linewidths) != len(positions): #ID46
             flag[46]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('linewidths and positions are unequal sized '
                              'sequences')
         else:#ID47
             flag[47]=True
         if len(colors) != len(positions): #ID48
             flag[48]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('colors and positions are unequal sized '
                              'sequences')
         else: #ID49
             flag[49]=True
         if len(alpha) != len(positions): #ID50
             flag[50]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('alpha and positions are unequal sized '
                              'sequences')
         else: #ID51
             flag[51]=True
         if len(linestyles) != len(positions): #ID52
             flag[52]=True
+            data["EVENTPLOT_ARRAY"]=flag
+            with open(root_folder,"w") as f:
+                yaml.dump(data,f)
             raise ValueError('linestyles and positions are unequal sized '
                              'sequences')
         else: #ID53
