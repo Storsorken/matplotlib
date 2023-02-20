@@ -3391,6 +3391,22 @@ def test_boxplot_with_CIarray():
     ax.set_ylim((-30, 30))
 
 
+@image_comparison(['boxplot_with_None_in_CI.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_with_CIarray2():
+    # Should bootstraps None values in the CI array and use other values as is
+    np.random.seed(937)
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    CIs = np.array([[-3, None], [None, None]])
+
+    ax.boxplot([x, x], notch=True, bootstrap=1000, conf_intervals=CIs)
+    ax.set_ylim((-10, 10))
+
+
 @image_comparison(['boxplot_no_inverted_whisker.png'],
                   remove_text=True, savefig_kwarg={'dpi': 40}, style='default')
 def test_boxplot_no_weird_whisker():
