@@ -3276,6 +3276,30 @@ def test_boxplot_autorange_whiskers():
     ax2.set_ylim((-5, 5))
 
 
+@image_comparison(['boxplot_with_props.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_props():
+    # tests props arguments work using color attribute
+    x = np.append(np.linspace(-7, 7, 140), np.linspace(15,20,10))
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    ax.boxplot(
+        [x, x],
+        meanline=True,
+        showmeans=True,
+        boxprops={"color": "r"},
+        sym="o",
+        whiskerprops={"color": "r"},
+        capprops={"color": "r"},
+        medianprops={"color": "r"},
+        meanprops={"color": "r"},
+        flierprops={"markeredgecolor": "r"},
+    )
+    ax.set_ylim((-30, 30))
+
+
 def _rc_test_bxp_helper(ax, rc_dict):
     x = np.linspace(-7, 7, 140)
     x = np.hstack([-25, x, 25])
