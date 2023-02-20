@@ -309,7 +309,7 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
         flags = [False for _ in range(39)]
 
     if y is None:
-        flags[0] = False
+        flags[0] = True
         # if y is None use x for y
         same_data = True
     else:
@@ -318,7 +318,6 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
         # implement the core of psd(), csd(), and spectrogram() without doing
         # extra calculations.  We return the unaveraged Pxy, freqs, and t.
         same_data = y is x
-
     if Fs is None:
         flags[2] = True
         Fs = 2
@@ -343,9 +342,11 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     _api.check_in_list(
         ['default', 'psd', 'complex', 'magnitude', 'angle', 'phase'],
         mode=mode)
-
     if not same_data and mode != 'psd':
         flags[8] = True
+        data["SPECTRAL_HELPER_ARRAY"] = flags # Change SPECTRAL_HELPER_ARRAY to your array
+        with open(root_folder, "w") as f:
+            yaml.dump(data, f)
         raise ValueError("x and y must be equal if mode is not 'psd'")
 
     # Make sure we're dealing with a numpy array. If y and x were the same
@@ -354,7 +355,6 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     if not same_data:
         flags[9] = True
         y = np.asarray(y)
-
     if sides is None or sides == 'default':
         flags[10] = True
         if np.iscomplexobj(x):
@@ -381,7 +381,6 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     if pad_to is None:
         flags[15] = True
         pad_to = NFFT
-
     if mode != 'psd':
         flags[16] = True
         scale_by_freq = False
@@ -409,12 +408,14 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
             flags[23] = True
             numFreqs = pad_to//2 + 1
         scaling_factor = 2.
-
     if not np.iterable(window):
         flags[24] = True
         window = window(np.ones(NFFT, x.dtype))
     if len(window) != NFFT:
         flags[25] = True
+        data["SPECTRAL_HELPER_ARRAY"] = flags # Change SPECTRAL_HELPER_ARRAY to your array
+        with open(root_folder, "w") as f:
+            yaml.dump(data, f)
         raise ValueError(
             "The window length must match the data's first dimension")
 
@@ -497,7 +498,7 @@ def _spectral_helper(x, y=None, NFFT=None, Fs=None, detrend_func=None,
     """
     writing to YML-file
     """
-    data["SPECTRAL_HELPER_ARRAY"] = flags # Change this to your array
+    data["SPECTRAL_HELPER_ARRAY"] = flags # Change SPECTRAL_HELPER_ARRAY to your array
     with open(root_folder, "w") as f:
         yaml.dump(data, f)
 
