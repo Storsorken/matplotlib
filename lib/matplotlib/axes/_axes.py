@@ -3867,13 +3867,12 @@ class Axes(_AxesBase):
                 has_xerr=(xerr is not None), has_yerr=(yerr is not None),
                 label=label)
             self.containers.append(errorbar_container)
-        
+            return errorbar_container  # (l0, caplines, barcols)
         finally:
             # Save to yml file
             data["ERRORBAR_ARRAY"] = flag
             with open(root_folder, "w") as f:
                 yaml.dump(data, f)
-            return errorbar_container  # (l0, caplines, barcols)
 
     @_preprocess_data()
     def boxplot(self, x, notch=None, sym=None, vert=None, whis=None,
