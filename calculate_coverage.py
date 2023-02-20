@@ -11,11 +11,22 @@ spectral_helper_array = np.array(data["SPECTRAL_HELPER_ARRAY"])
 errorbar_array = np.array(data["ERRORBAR_ARRAY"])
 
 print("BOXPLOT coverage: ", boxplot_array.sum()*100/len(boxplot_array), "%")
-print("EVENTPLOT coverage: ", eventplot_array.sum()*100/len(eventplot_array), "%")
-print("HIST coverage: ", hist_array.sum()*100/len(hist_array), "%")
-print("MAKE_IMAGE coverage: ", make_image_array.sum()*100/len(make_image_array), "%")
-print("SPECTRAL_HELPER coverage: ", spectral_helper_array.sum()*100/len(spectral_helper_array), "%")
-print("ERRORBAR coverage: ", errorbar_array.sum()*100/len(errorbar_array), "%")
+print(f"BOXPLOT uncovered flags#: {' '.join([str(i) for i, v in enumerate(boxplot_array) if not v])}")
+
+print("\nEVENTPLOT coverage: ", eventplot_array.sum()*100/len(eventplot_array), "%")
+print(f"EVENTPLOT uncovered flags#: {' '.join([str(i) for i, v in enumerate(eventplot_array) if not v])}")
+
+print("\nHIST coverage: ", hist_array.sum()*100/len(hist_array), "%")
+print(f"HIST uncovered flags#: {' '.join([str(i) for i, v in enumerate(hist_array) if not v])}")
+
+print("\nMAKE_IMAGE coverage: ", make_image_array.sum()*100/len(make_image_array), "%")
+print(f"MAKE_IMAGE uncovered flags#: {' '.join([str(i) for i, v in enumerate(make_image_array) if not v])}")
+
+print("\nSPECTRAL_HELPER coverage: ", spectral_helper_array.sum()*100/len(spectral_helper_array), "%")
+print(f"SPECTRAL_HELPER uncovered flags#: {' '.join([str(i) for i, v in enumerate(spectral_helper_array) if not v])}")
+
+print("\nERRORBAR coverage: ", errorbar_array.sum()*100/len(errorbar_array), "%")
+print(f"ERRORBAR uncovered flags#: {' '.join([str(i) for i, v in enumerate(errorbar_array) if not v])}")
 
 reset = input('\nClear flag_arrays.yml file? (Y/N):')
 if reset == 'Y':
