@@ -3607,7 +3607,7 @@ class Axes(_AxesBase):
                 data=yaml.load(fin, Loader=yaml.FullLoader)
                 flag=data["ERRORBAR_ARRAY"]
             if len(flag)==0:
-                flag = [False for _ in range(61)]
+                flag = [False for _ in range(29)]
 
             kwargs = cbook.normalize_kwargs(kwargs, mlines.Line2D)
             # Drop anything that comes in as None to use the default instead.
