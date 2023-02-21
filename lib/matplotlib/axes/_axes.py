@@ -3768,6 +3768,32 @@ class Axes(_AxesBase):
                     if med is not None:
                         stats['med'] = med
 
+    def conf_intervals_helper(self, conf_intervals, bxpstats):
+        """ 
+        Helper method for handling conf_interval arguement in boxplot
+         
+        Parameters
+        ----------
+        conf_intervals: conf_intervals from boxplot method
+
+        bxpstats: bxpstats from boxplot method
+        """
+        if conf_intervals is not None:
+            if len(conf_intervals) != len(bxpstats):
+                raise ValueError(
+                    "'conf_intervals' and 'x' have different lengths")
+            else:
+                for stats, ci in zip(bxpstats, conf_intervals):
+                    if ci is not None:
+                        if len(ci) != 2:
+                            raise ValueError('each confidence interval must '
+                                             'have two values')
+                        else:
+                            if ci[0] is not None:
+                                stats['cilo'] = ci[0]
+                            if ci[1] is not None:
+                                stats['cihi'] = ci[1]
+
     @_preprocess_data()
     def boxplot(self, x, notch=None, sym=None, vert=None, whis=None,
                 positions=None, widths=None, patch_artist=None,
@@ -4010,22 +4036,7 @@ class Axes(_AxesBase):
 
         showfliers, flierprops = self.fliers_helper(showfliers, sym)
         self.usermedians_helper(usermedians, bxpstats)
-
-        if conf_intervals is not None:
-            if len(conf_intervals) != len(bxpstats):
-                raise ValueError(
-                    "'conf_intervals' and 'x' have different lengths")
-            else:
-                for stats, ci in zip(bxpstats, conf_intervals):
-                    if ci is not None:
-                        if len(ci) != 2:
-                            raise ValueError('each confidence interval must '
-                                             'have two values')
-                        else:
-                            if ci[0] is not None:
-                                stats['cilo'] = ci[0]
-                            if ci[1] is not None:
-                                stats['cihi'] = ci[1]
+        self.conf_intervals_helper(conf_intervals, bxpstats) 
 
         artists = self.bxp(bxpstats, positions=positions, widths=widths,
                            vert=vert, patch_artist=patch_artist,
