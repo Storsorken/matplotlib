@@ -3745,6 +3745,29 @@ class Axes(_AxesBase):
 
         return showfliers, flierprops
 
+    def usermedians_helper(self, usermedians, bxpstats):
+        """
+        Helper method for boxplot for handling usermedians
+        
+
+        Parameters
+        ----------
+        usermedians: usermedians from boxplot method
+
+        bxpstats: bxpstats from boxplot method
+        """
+        # replace medians if necessary:
+        if usermedians is not None:
+            if (len(np.ravel(usermedians)) != len(bxpstats) or
+                    np.shape(usermedians)[0] != len(bxpstats)):
+                raise ValueError(
+                    "'usermedians' and 'x' have different lengths")
+            else:
+                # reassign medians as necessary
+                for stats, med in zip(bxpstats, usermedians):
+                    if med is not None:
+                        stats['med'] = med
+
     @_preprocess_data()
     def boxplot(self, x, notch=None, sym=None, vert=None, whis=None,
                 positions=None, widths=None, patch_artist=None,
@@ -3986,18 +4009,7 @@ class Axes(_AxesBase):
                 boxprops['edgecolor'] = boxprops.pop('color')
 
         showfliers, flierprops = self.fliers_helper(showfliers, sym)
-
-        # replace medians if necessary:
-        if usermedians is not None:
-            if (len(np.ravel(usermedians)) != len(bxpstats) or
-                    np.shape(usermedians)[0] != len(bxpstats)):
-                raise ValueError(
-                    "'usermedians' and 'x' have different lengths")
-            else:
-                # reassign medians as necessary
-                for stats, med in zip(bxpstats, usermedians):
-                    if med is not None:
-                        stats['med'] = med
+        self.usermedians_helper(usermedians, bxpstats)
 
         if conf_intervals is not None:
             if len(conf_intervals) != len(bxpstats):
