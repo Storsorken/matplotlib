@@ -3710,7 +3710,15 @@ class Axes(_AxesBase):
         return errorbar_container  # (l0, caplines, barcols)
 
     def fliers_helper(self, showfliers, sym):
-        """ Helper method for boxplot for handling fliers """
+        """
+        Helper method for boxplot for handling fliers
+        
+        Parameters
+        ----------
+        showfliers: showfliers from boxplot method
+
+        sym: sym from boxplot method
+        """
         # if non-default sym value, put it into the flier dictionary
         # the logic for providing the default symbol ('b+') now lives
         # in bxp in the initial value of flierkw
