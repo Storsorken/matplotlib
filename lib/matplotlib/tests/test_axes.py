@@ -3190,6 +3190,19 @@ def test_boxplot():
     ax.set_ylim((-30, 30))
 
 
+@image_comparison(['boxplot_with_patch_artist.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_with_patch_artist_and_color():
+    # patch_artist argument works and takes into account boxprop color
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    ax.boxplot([x, x], patch_artist=True, boxprops={'color':'r'})
+    ax.set_ylim((-10, 10))
+
+
 @image_comparison(['boxplot_custom_capwidths.png'],
                   savefig_kwarg={'dpi': 40}, style='default')
 def test_boxplot_custom_capwidths():
@@ -3199,6 +3212,20 @@ def test_boxplot_custom_capwidths():
     fig, ax = plt.subplots()
 
     ax.boxplot([x, x], notch=1, capwidths=[0.01, 0.2])
+
+
+@image_comparison(['boxplot_sym3.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_sym3():
+    # fliers are properly hidden
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+
+    ax.boxplot([x, x], sym='')
+    ax.set_ylim((-30, 30))
 
 
 @image_comparison(['boxplot_sym2.png'], remove_text=True, style='default')
@@ -3247,6 +3274,30 @@ def test_boxplot_autorange_whiskers():
     fig2, ax2 = plt.subplots()
     ax2.boxplot([x, x], bootstrap=10000, notch=1, autorange=True)
     ax2.set_ylim((-5, 5))
+
+
+@image_comparison(['boxplot_with_props.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_props():
+    # tests props arguments work using color attribute
+    x = np.append(np.linspace(-7, 7, 140), np.linspace(15,20,10))
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    ax.boxplot(
+        [x, x],
+        meanline=True,
+        showmeans=True,
+        boxprops={"color": "r"},
+        sym="o",
+        whiskerprops={"color": "r"},
+        capprops={"color": "r"},
+        medianprops={"color": "r"},
+        meanprops={"color": "r"},
+        flierprops={"markeredgecolor": "r"},
+    )
+    ax.set_ylim((-30, 30))
 
 
 def _rc_test_bxp_helper(ax, rc_dict):
@@ -3338,6 +3389,22 @@ def test_boxplot_with_CIarray():
     ax.boxplot([x, x], bootstrap=10000, usermedians=[None, 1.0],
                conf_intervals=CIs, notch=1)
     ax.set_ylim((-30, 30))
+
+
+@image_comparison(['boxplot_with_None_in_CI.png'],
+                  remove_text=True,
+                  savefig_kwarg={'dpi': 40},
+                  style='default')
+def test_boxplot_with_CIarray2():
+    # Should bootstraps None values in the CI array and use other values as is
+    np.random.seed(937)
+    x = np.linspace(-7, 7, 140)
+    x = np.hstack([-25, x, 25])
+    fig, ax = plt.subplots()
+    CIs = np.array([[-3, None], [None, None]])
+
+    ax.boxplot([x, x], notch=True, bootstrap=1000, conf_intervals=CIs)
+    ax.set_ylim((-10, 10))
 
 
 @image_comparison(['boxplot_no_inverted_whisker.png'],
