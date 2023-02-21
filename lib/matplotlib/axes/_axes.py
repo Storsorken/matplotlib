@@ -3709,6 +3709,42 @@ class Axes(_AxesBase):
 
         return errorbar_container  # (l0, caplines, barcols)
 
+    def fliers_helper(self, showfliers, sym):
+        """ Helper method for boxplot for handling fliers """
+        # if non-default sym value, put it into the flier dictionary
+        # the logic for providing the default symbol ('b+') now lives
+        # in bxp in the initial value of flierkw
+        # handle all of the *sym* related logic here so we only have to pass
+        # on the flierprops dict.
+        flierprops = dict()
+        if sym is not None:
+            # no-flier case, which should really be done with
+            # 'showfliers=False' but none-the-less deal with it to keep back
+            # compatibility
+            if sym == '':
+                # blow away existing dict and make one for invisible markers
+                flierprops = dict(linestyle='none', marker='', color='none')
+                # turn the fliers off just to be safe
+                showfliers = False
+            # now process the symbol string
+            else:
+                # process the symbol string
+                # discarded linestyle
+                _, marker, color = _process_plot_format(sym)
+                # if we have a marker, use it
+                if marker is not None:
+                    flierprops['marker'] = marker
+                # if we have a color, use it
+                if color is not None:
+                    # assume that if color is passed in the user want
+                    # filled symbol, if the users want more control use
+                    # flierprops
+                    flierprops['color'] = color
+                    flierprops['markerfacecolor'] = color
+                    flierprops['markeredgecolor'] = color
+
+        return showfliers, flierprops
+
     @_preprocess_data()
     def boxplot(self, x, notch=None, sym=None, vert=None, whis=None,
                 positions=None, widths=None, patch_artist=None,
@@ -3949,36 +3985,7 @@ class Axes(_AxesBase):
             if 'color' in boxprops:
                 boxprops['edgecolor'] = boxprops.pop('color')
 
-        # if non-default sym value, put it into the flier dictionary
-        # the logic for providing the default symbol ('b+') now lives
-        # in bxp in the initial value of flierkw
-        # handle all of the *sym* related logic here so we only have to pass
-        # on the flierprops dict.
-        if sym is not None:
-            # no-flier case, which should really be done with
-            # 'showfliers=False' but none-the-less deal with it to keep back
-            # compatibility
-            if sym == '':
-                # blow away existing dict and make one for invisible markers
-                flierprops = dict(linestyle='none', marker='', color='none')
-                # turn the fliers off just to be safe
-                showfliers = False
-            # now process the symbol string
-            else:
-                # process the symbol string
-                # discarded linestyle
-                _, marker, color = _process_plot_format(sym)
-                # if we have a marker, use it
-                if marker is not None:
-                    flierprops['marker'] = marker
-                # if we have a color, use it
-                if color is not None:
-                    # assume that if color is passed in the user want
-                    # filled symbol, if the users want more control use
-                    # flierprops
-                    flierprops['color'] = color
-                    flierprops['markerfacecolor'] = color
-                    flierprops['markeredgecolor'] = color
+        showfliers, flierprops = self.fliers_helper(showfliers, sym)
 
         # replace medians if necessary:
         if usermedians is not None:
